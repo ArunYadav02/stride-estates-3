@@ -1,0 +1,86 @@
+/* ===========================================================================
+   TIER 2 — SEMANTIC TOKENS
+   Named for their JOB, not their colour. A component asks for
+   `--border-subtle`, never `--grey-200`, so switching theme changes one
+   mapping rather than a hundred components.
+   =========================================================================== */
+
+[data-theme='light'] {
+  --surface-page:    var(--grey-50);
+  --surface-card:    #ffffff;
+  --surface-raised:  #ffffff;
+  --surface-sunken:  var(--grey-100);
+  --surface-hover:   var(--grey-50);
+  --surface-inset:   var(--grey-25);
+
+  --border-subtle:   var(--grey-200);
+  --border-default:  var(--grey-300);
+  --border-strong:   var(--grey-400);
+
+  --text-primary:    var(--grey-900);
+  --text-secondary:  var(--grey-600);
+  --text-tertiary:   var(--grey-500);
+  --text-inverse:    #ffffff;
+
+  --accent:          var(--green-600);
+  --accent-hover:    var(--green-700);
+  --accent-subtle:   var(--green-100);
+  --accent-border:   var(--green-200);
+  --accent-contrast: #ffffff;
+
+  --success:         var(--green-600);
+  --success-subtle:  var(--green-100);
+  --warning:         var(--amber-500);
+  --warning-subtle:  var(--amber-100);
+  --danger:          var(--red-500);
+  --danger-subtle:   var(--red-100);
+  --info:            var(--blue-500);
+  --info-subtle:     var(--blue-100);
+
+  --shadow-sm: 0 1px 2px rgba(22, 32, 29, 0.05);
+  --shadow-md: 0 1px 3px rgba(22, 32, 29, 0.06), 0 8px 24px -16px rgba(22, 32, 29, 0.24);
+  --shadow-lg: 0 2px 6px rgba(22, 32, 29, 0.08), 0 24px 60px -24px rgba(22, 32, 29, 0.34);
+
+  --scrim: rgba(22, 32, 29, 0.34);
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --surface-page:    var(--grey-950);
+  --surface-card:    #111b19;
+  --surface-raised:  #16221f;
+  --surface-sunken:  #0a110f;
+  --surface-hover:   #16221f;
+  --surface-inset:   #0e1917;
+
+  --border-subtle:   #1e2c29;
+  --border-default:  #293a36;
+  --border-strong:   #3b504a;
+
+  --text-primary:    #e8efec;
+  --text-secondary:  #93a5a0;
+  --text-tertiary:   #6c7d78;
+  --text-inverse:    var(--grey-950);
+
+  --accent:          var(--green-400);
+  --accent-hover:    #6ed6b3;
+  --accent-subtle:   rgba(79, 199, 158, 0.13);
+  --accent-border:   rgba(79, 199, 158, 0.34);
+  --accent-contrast: var(--green-900);
+
+  --success:         var(--green-400);
+  --success-subtle:  rgba(79, 199, 158, 0.13);
+  --warning:         var(--amber-400);
+  --warning-subtle:  rgba(226, 165, 75, 0.14);
+  --danger:          var(--red-400);
+  --danger-subtle:   rgba(234, 131, 119, 0.14);
+  --info:            var(--blue-400);
+  --info-subtle:     rgba(111, 168, 221, 0.14);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.5), 0 10px 28px -18px rgba(0, 0, 0, 0.9);
+  --shadow-lg: 0 2px 8px rgba(0, 0, 0, 0.55), 0 28px 64px -26px rgba(0, 0, 0, 1);
+
+  --scrim: rgba(3, 8, 7, 0.62);
+  color-scheme: dark;
+}

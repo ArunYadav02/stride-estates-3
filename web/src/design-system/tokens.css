@@ -1,0 +1,105 @@
+/* ===========================================================================
+   TIER 1 — PRIMITIVES
+   Raw values with no opinion about where they are used. Nothing in the
+   application should reference these directly; components use the semantic
+   tokens in themes.css, which are built from these. Two tiers means the whole
+   product can be re-themed by editing one file.
+   =========================================================================== */
+
+:root {
+  /* --- palette: warm neutrals, because a cold grey UI reads as unfinished --- */
+  --grey-25:  #fbfbfa;
+  --grey-50:  #f6f7f5;
+  --grey-100: #eef0ed;
+  --grey-200: #e3e6e2;
+  --grey-300: #d1d6d1;
+  --grey-400: #a9b3ae;
+  --grey-500: #7d8a85;
+  --grey-600: #5b6763;
+  --grey-700: #3f4a46;
+  --grey-800: #26302d;
+  --grey-900: #16201d;
+  --grey-950: #0c1412;
+
+  /* --- brand --- */
+  --green-100: #dcefe6;
+  --green-200: #b5dfcd;
+  --green-400: #4fc79e;
+  --green-500: #17916a;
+  --green-600: #0f7a57;
+  --green-700: #0b5f44;
+  --green-900: #06231a;
+
+  /* --- status --- */
+  --amber-100: #fbeeda;
+  --amber-500: #b8760f;
+  --amber-400: #e2a54b;
+  --red-100:   #fbe9e7;
+  --red-500:   #b23a2f;
+  --red-400:   #ea8377;
+  --blue-100:  #e3edf8;
+  --blue-500:  #2a6296;
+  --blue-400:  #6fa8dd;
+
+  /* --- spacing: a 4px base, named by step not by pixel --- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* --- radius --- */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 999px;
+
+  /* --- type --- */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --text-2xs: 10px;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-md: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 26px;
+  --text-3xl: 34px;
+
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semi: 600;
+  --weight-bold: 700;
+
+  --tracking-label: 0.12em;
+  --tracking-tight: -0.015em;
+  --tracking-tighter: -0.03em;
+
+  /* --- motion: one easing curve, three durations --- */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --fast: 120ms;
+  --normal: 200ms;
+  --slow: 340ms;
+
+  /* --- elevation --- */
+  --z-base: 1;
+  --z-sticky: 20;
+  --z-drawer: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --z-palette: 70;
+
+  /* --- layout --- */
+  --sidebar-width: 236px;
+  --topbar-height: 56px;
+  --content-max: 1440px;
+}

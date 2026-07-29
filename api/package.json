@@ -1,0 +1,19 @@
+{
+  "name": "stride-estates-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --no-warnings=ExperimentalWarning --watch src/index.js",
+    "start": "node --no-warnings=ExperimentalWarning src/index.js",
+    "db:reset": "node --no-warnings=ExperimentalWarning src/db/reset.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.2.0"
+  }
+}

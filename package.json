@@ -1,0 +1,13 @@
+{
+  "name": "stride-estates",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Estate and letting agency platform — agency operations, client portal, and document intelligence.",
+  "scripts": {
+    "setup": "npm --prefix api install && npm --prefix web install && npm run db:reset",
+    "db:reset": "npm --prefix api run db:reset",
+    "dev:api": "npm --prefix api run dev",
+    "dev:web": "npm --prefix web run dev",
+    "build": "npm --prefix web run build"
+  }
+}

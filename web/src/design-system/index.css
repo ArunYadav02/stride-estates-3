@@ -1,0 +1,17 @@
+/* ===========================================================================
+   CSS ENTRY POINT
+   The cascade is declared once, here. Later layers win regardless of
+   specificity, which means a component never has to fight the base styles and
+   nothing ever needs !important.
+   =========================================================================== */
+
+@layer tokens, base, components, utilities, overrides;
+
+@import './tokens.css'    layer(tokens);
+@import './themes.css'    layer(tokens);
+@import './base.css'      layer(base);
+@import './utilities.css' layer(utilities);
+
+/* Component styles arrive through CSS Modules, which are scoped by build. They
+   are assigned to the `components` layer by importing them from JS after this
+   file — see app/main.jsx. */

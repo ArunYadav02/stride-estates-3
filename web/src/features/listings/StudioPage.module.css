@@ -1,0 +1,52 @@
+.output { display: grid; gap: var(--space-3); }
+
+.channel {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface-card);
+}
+.channelHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--surface-inset);
+}
+.channelBody {
+  padding: var(--space-3);
+  white-space: pre-wrap;
+  line-height: 1.65;
+  font-size: var(--text-base);
+}
+.count { margin-left: auto; font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--text-tertiary); }
+
+.toneGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-2); }
+.tone {
+  text-align: left;
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--surface-card);
+  cursor: pointer;
+  transition: border-color var(--fast) var(--ease), background var(--fast) var(--ease);
+}
+.tone:hover { border-color: var(--border-strong); }
+.toneOn { border-color: var(--accent); background: var(--accent-subtle); }
+.toneName { font-weight: var(--weight-semi); text-transform: capitalize; }
+.toneWhy { font-size: var(--text-sm); color: var(--text-tertiary); margin-top: 2px; }
+
+.pipeline { display: grid; gap: var(--space-2); }
+.step { display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-base); }
+.stepMark {
+  width: 22px; height: 22px; flex: none;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--border-default);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  color: var(--text-tertiary);
+}
+.stepDone { background: var(--accent); border-color: var(--accent); color: var(--accent-contrast); }
+.stepActive { border-color: var(--accent); color: var(--accent); }

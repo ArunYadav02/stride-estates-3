@@ -1,0 +1,68 @@
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-palette);
+  background: var(--scrim);
+  backdrop-filter: blur(3px);
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  padding-top: 14vh;
+  animation: fade var(--fast) var(--ease);
+}
+
+.panel {
+  width: min(560px, calc(100vw - var(--space-8)));
+  background: var(--surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: drop var(--normal) var(--ease);
+}
+
+.inputRow { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border-subtle); }
+.input { flex: 1; border: 0; background: none; outline: none; font-size: var(--text-lg); color: var(--text-primary); }
+.input::placeholder { color: var(--text-tertiary); }
+
+.results { max-height: 380px; overflow-y: auto; padding: var(--space-2); }
+.group { padding: var(--space-2) var(--space-2) var(--space-1); }
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+.itemOn { background: var(--accent-subtle); color: var(--accent); }
+.itemMeta { margin-left: auto; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-tertiary); }
+.itemSub { display: block; font-size: var(--text-sm); color: var(--text-tertiary); }
+
+.footer {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+.key {
+  font-family: var(--font-mono);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-sunken);
+  border-radius: var(--radius-xs);
+  padding: 0 4px;
+  margin-right: 4px;
+}
+
+.none { padding: var(--space-8); text-align: center; color: var(--text-tertiary); }
+
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes drop { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }

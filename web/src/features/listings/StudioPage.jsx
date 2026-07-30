@@ -197,6 +197,65 @@ export default function StudioPage() {
             </p>
           </Card>
 
+          {result?.material_information && (
+            <Card
+              title="Material information"
+              subtitle="Checked against the record, not the copy"
+            >
+              <Banner tone={result.material_information.publishable ? 'accent' : 'danger'}>
+                {result.material_information.headline}
+              </Banner>
+
+              <div className="stack" style={{ marginTop: 'var(--space-4)' }}>
+                {['A', 'B', 'C'].map((part) => {
+                  const items = result.material_information.items.filter((item) => item.part === part);
+                  if (!items.length) return null;
+                  return (
+                    <div key={part}>
+                      <p className="label" style={{ marginBottom: 6 }}>
+                        Part {part}
+                        {part === 'A' && ' · required on every listing'}
+                        {part === 'B' && ' · applies to all property'}
+                        {part === 'C' && ' · disclose where it applies'}
+                      </p>
+                      <div style={{ display: 'grid', gap: 6 }}>
+                        {items.map((item) => (
+                          <div
+                            key={item.key}
+                            style={{
+                              display: 'flex',
+                              gap: 'var(--space-3)',
+                              alignItems: 'flex-start',
+                              padding: 'var(--space-2) var(--space-3)',
+                              border: '1px solid var(--border-subtle)',
+                              borderLeft: `3px solid var(--${item.status === 'present' ? 'success' : part === 'A' ? 'danger' : 'warning'})`,
+                              borderRadius: 'var(--radius-xs)',
+                            }}
+                          >
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                              <p style={{ fontWeight: 'var(--weight-medium)' }}>{item.label}</p>
+                              {item.hint && <p className="faint" style={{ marginTop: 2 }}>{item.hint}</p>}
+                              {item.value && <p className="faint" style={{ marginTop: 2 }}>{item.value}</p>}
+                            </div>
+                            <Badge tone={item.status === 'present' ? 'success' : part === 'A' ? 'danger' : 'warning'}>
+                              {item.status === 'present' ? 'recorded' : 'missing'}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <p className="faint" style={{ marginTop: 'var(--space-4)', lineHeight: 1.6 }}>
+                National Trading Standards requires Parts A and B on every advert. Portals reject
+                Part A gaps outright, and an omission is a Consumer Protection Regulations problem
+                rather than an untidy record. Record these against the property, not in the copy.
+              </p>
+            </Card>
+          )}
+
           {result && (
             <>
               <Card title="Compliance check">

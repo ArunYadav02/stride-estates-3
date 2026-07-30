@@ -15,6 +15,8 @@ import CompliancePage from '../features/compliance/CompliancePage';
 import MaintenancePage from '../features/maintenance/MaintenancePage';
 import DocumentsPage from '../features/documents/DocumentsPage';
 import StudioPage from '../features/listings/StudioPage';
+import ConciergePage from '../features/concierge/ConciergePage';
+import SalesPage from '../features/sales/SalesPage';
 
 function SignedIn() {
   // One shared fetch so the sidebar can badge compliance without every page
@@ -36,6 +38,8 @@ function SignedIn() {
         <Route path="maintenance" element={<MaintenancePage />} />
         <Route path="documents" element={<DocumentsPage />} />
         <Route path="studio" element={<StudioPage />} />
+        <Route path="concierge" element={<ConciergePage />} />
+        <Route path="sales" element={<SalesPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

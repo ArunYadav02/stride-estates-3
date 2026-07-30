@@ -51,3 +51,18 @@ export const IconTrash = (p) => (
 export const IconUpload = (p) => (
   <svg {...base} {...p}><path d="M12 16V4M8 8l4-4 4 4" /><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /></svg>
 );
+
+export const IconChain = (p) => (
+  <svg {...base} {...p}>
+    <path d="M9.5 14.5 14.5 9.5" />
+    <path d="M13 7.5 14.8 5.7a3.4 3.4 0 0 1 4.8 4.8L17.8 12.3" />
+    <path d="M11 16.5 9.2 18.3a3.4 3.4 0 0 1-4.8-4.8L6.2 11.7" />
+  </svg>
+);
+
+export const IconChat = (p) => (
+  <svg {...base} {...p}>
+    <path d="M21 12a8 8 0 0 1-8 8H8l-4 3v-6.5A8 8 0 0 1 12 4h1a8 8 0 0 1 8 8z" />
+    <path d="M9 11h6M9 14h4" />
+  </svg>
+);

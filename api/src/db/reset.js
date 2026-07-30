@@ -4,7 +4,8 @@ import { seed } from './seed.js';
 
 // Order matters: children before parents, or the foreign keys complain.
 const TABLES = [
-  'activity', 'document_chunks', 'documents', 'listings', 'property_media',
+  'activity', 'chain_links', 'chains',
+  'document_chunks', 'documents', 'listings', 'property_media',
   'maintenance_tickets', 'certificates', 'tasks', 'viewings', 'requirements',
   'properties', 'contacts', 'users', 'agencies',
 ];

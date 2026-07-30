@@ -10,6 +10,8 @@ import documentRoutes from './documents.js';
 import mediaRoutes from './media.js';
 import listingRoutes from './listings.js';
 import maintenanceRoutes from './maintenance.js';
+import conciergeRoutes from './concierge.js';
+import salesRoutes from './sales.js';
 
 const router = Router();
 
@@ -25,5 +27,7 @@ router.use('/documents', requireAuth, documentRoutes);
 router.use('/media', requireAuth, mediaRoutes);
 router.use('/listings', requireAuth, listingRoutes);
 router.use('/maintenance', requireAuth, maintenanceRoutes);
+router.use('/concierge', requireAuth, conciergeRoutes);
+router.use('/sales', requireAuth, salesRoutes);
 
 export default router;

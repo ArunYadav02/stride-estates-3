@@ -8,6 +8,7 @@ import { db } from './index.js';
 import { hashPassword } from '../lib/auth.js';
 import { uuid, now } from '../lib/helpers.js';
 import { chunkDocument } from '../services/retrieval.js';
+import { openingMessage } from '../services/concierge.js';
 
 const daysFromNow = (days) =>
   new Date(Date.now() + days * 86400000).toISOString();
@@ -78,17 +79,27 @@ export function seed() {
     const id = uuid();
     const created = daysFromNow(createdOffset);
 
+    // Deliberately uneven: some records are complete, some are not, so the
+    // material information check has something real to complain about.
+    const tenure = listing === 'sale' ? (type === 'flat' ? 'leasehold' : 'freehold') : null;
+    const band = index % 3 === 0 ? null : ['C', 'D', 'E', 'F'][index % 4];
+    const extra = index % 2 === 0
+      ? JSON.stringify({ utilities: 'Mains gas, electricity and water', parking: 'Allocated bay' })
+      : '{}';
+
     db.run(
       `INSERT INTO properties
         (id, agency_id, reference, listing_type, status, line1, city, area, postcode,
          property_type, bedrooms, bathrooms, price_pence, furnished, pets_allowed, epc_rating,
-         features, description, available_from, landlord_id, created_at, updated_at)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+         features, description, available_from, tenure, council_tax_band, material_info,
+         landlord_id, created_at, updated_at)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
       [id, agencyId, `STR-${String(index + 1).padStart(4, '0')}`, listing,
        index === 2 ? 'let_agreed' : index === 6 ? 'under_offer' : 'available',
        line1, city, area, postcode, type, beds, baths, price, furnished, pets, epc,
        JSON.stringify(features), description,
        availableOffset === null ? null : dateFromNow(availableOffset),
+       tenure, band, extra,
        landlords[index % landlords.length], created, created]
     );
     return id;
@@ -289,6 +300,115 @@ Parking is permitted in the allocated bay numbered four only. Visitor parking is
     );
   });
 
+  // ----------------------------- sales chain -------------------------------
+  const chainId = uuid();
+  db.run(
+    'INSERT INTO chains (id, agency_id, name, property_id, target_date, created_at) VALUES (?,?,?,?,?,?)',
+    [chainId, agencyId, 'Chain · 44 Vicarage Farm Road', propertyIds[5], dateFromNow(38), timestamp]
+  );
+
+  const m = (done, active, blocked) => {
+    const all = {};
+    ['offer_accepted', 'solicitors_instructed', 'searches_ordered',
+     'enquiries_answered', 'mortgage_offer', 'exchange'].forEach((key) => {
+      all[key] = done.includes(key) ? 'done' : blocked === key ? 'blocked' : active === key ? 'active' : 'todo';
+    });
+    return JSON.stringify(all);
+  };
+
+  const links = [
+    [0, 'Flat 12, Sefton House', 'K. Adeyemi buying', 'First-time buyer', 0, null,
+      m(['offer_accepted', 'solicitors_instructed', 'searches_ordered', 'enquiries_answered'], 'mortgage_offer', null),
+      'Lender valuation passed, waiting on the formal offer', -41],
+    [1, '44 Vicarage Farm Road', 'The Okonjo family selling', 'Our instruction', 1, propertyIds[5],
+      m(['offer_accepted', 'solicitors_instructed', 'searches_ordered'], null, 'enquiries_answered'),
+      'Seller\'s solicitor has not replied to enquiries in 19 days', -52],
+    [2, '2 Chesterfield Court', 'R. Tan selling and buying on', 'Chain link', 0, propertyIds[6],
+      m(['offer_accepted', 'solicitors_instructed'], 'searches_ordered', null),
+      'Searches ordered with Hounslow Council 21 Jul', -34],
+    [3, 'Oakfield, Fulmer Road', 'Vendor · chain-free onward', 'Top of chain', 0, null,
+      m(['offer_accepted', 'solicitors_instructed', 'searches_ordered', 'enquiries_answered', 'mortgage_offer'], 'exchange', null),
+      'Ready to exchange, waiting for the rest of the chain', -60],
+  ];
+
+  links.forEach(([position, address, party, role, ours, propertyId, milestones, note, agreedOffset]) => {
+    db.run(
+      `INSERT INTO chain_links
+        (id, agency_id, chain_id, position, address, party, role, is_ours, property_id,
+         milestones, stage_note, agreed_on, created_at, updated_at)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      [uuid(), agencyId, chainId, position, address, party, role, ours, propertyId,
+       milestones, note, dateFromNow(agreedOffset), timestamp, timestamp]
+    );
+  });
+
+  const offers = [
+    [propertyIds[5], applicantIds[4], 46200000, 'accepted', 'chain', 'Accepted 6 Jun, subject to contract'],
+    [propertyIds[6], null, 38500000, 'accepted', 'cash', 'Cash buyer, no chain'],
+    [propertyIds[7], applicantIds[5], 79500000, 'pending', 'mortgage_agreed', 'Below asking, vendor considering'],
+  ];
+
+  offers.forEach(([propertyId, contactId, amount, status, position, note]) => {
+    db.run(
+      `INSERT INTO offers
+        (id, agency_id, property_id, contact_id, amount_pence, status, position, note, created_at, updated_at)
+       VALUES (?,?,?,?,?,?,?,?,?,?)`,
+      [uuid(), agencyId, propertyId, contactId, amount, status, position, note, timestamp, timestamp]
+    );
+  });
+
+  // --------------------------- live enquiries ------------------------------
+  const conversations = [
+    {
+      handle: '07700 900431', name: 'Unknown caller', source: 'Rightmove',
+      property: propertyIds[0], state: 'QUALIFY_BUDGET', facts: {},
+      turns: [
+        ['enquirer', 'Hi, is the flat on Kingsley Road still available? Saw it on Rightmove'],
+        ['assistant', null],
+      ],
+    },
+    {
+      handle: '07700 900118', name: 'H. Lindqvist', source: 'Zoopla',
+      property: propertyIds[3], state: 'HANDOVER', facts: { note: 'Looking in Manchester' },
+      escalated: 1, reason: 'The enquirer is looking outside the patch',
+      turns: [
+        ['enquirer', 'Do you have anything similar in Manchester? Relocating in September'],
+        ['assistant', 'Thank you — I am passing this to one of the team, who will come back to you shortly.'],
+      ],
+    },
+  ];
+
+  let conversationCount = 0;
+  conversations.forEach((item) => {
+    const conversationId = uuid();
+    const property = db.get('SELECT * FROM properties WHERE id = ?', [item.property]);
+
+    db.run(
+      `INSERT INTO conversations
+        (id, agency_id, property_id, channel, handle, display_name, source, state, facts,
+         attempts, escalated, escalation_reason, sensitive, provider, created_at, updated_at)
+       VALUES (?,?,?,'sms',?,?,?,?,?,0,?,?,0,'scripted',?,?)`,
+      [conversationId, agencyId, item.property, item.handle, item.name, item.source,
+       item.state, JSON.stringify(item.facts), item.escalated || 0, item.reason ?? null,
+       daysFromNow(-0.3), daysFromNow(-0.25)]
+    );
+
+    item.turns.forEach(([role, body], i) => {
+      db.run(
+        `INSERT INTO conversation_messages
+          (id, agency_id, conversation_id, role, body, state_before, state_after, reason, provider, created_at)
+         VALUES (?,?,?,?,?,?,?,?,?,?)`,
+        [uuid(), agencyId, conversationId, role,
+         body || openingMessage({ property }),
+         i === 0 ? null : 'GREETING', i === 0 ? null : item.state,
+         i === 0 ? null : 'Opening message; nothing to qualify yet',
+         role === 'assistant' ? 'scripted' : null,
+         daysFromNow(-0.3 + i * 0.01)]
+      );
+    });
+    conversationCount += 1;
+  });
+
   return {
     agency: 1,
     users: 2,
@@ -298,5 +418,8 @@ Parking is permitted in the allocated bay numbered four only. Visitor parking is
     certificates: certificates.length,
     maintenance: tickets.length,
     document_chunks: chunks.length,
+    chain_links: links.length,
+    offers: offers.length,
+    conversations: conversationCount,
   };
 }

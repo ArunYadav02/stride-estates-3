@@ -57,12 +57,49 @@ Same for the web app on 5174.
 | **Maintenance** | Working | Priority ordering, response targets, breach detection |
 | **Document search** | Working | Chunking, BM25 retrieval, answers with page citations |
 | **Listing studio** | Working | Photos + facts → portal, Instagram and email copy |
+| **Lead concierge** | Working | Server-enforced state machine, guardrails, real diary booking |
+| **Sales progression** | Working | Whole-chain view, milestone tracking, weakest-link detection |
+| **Material information** | Working | Parts A/B/C checked against the record before copy goes out |
 | **Command palette** | Working | ⌘K search across properties, applicants and pages |
 | **Client portal** | Not started | See ROADMAP — this is the next big piece |
-| **Sales progression** | Not started | Offers, chain, exchange, completion |
+| **Analytics** | Not started | Conversion, time-to-exchange, lead response |
 | **Client accounts** | Deliberately not building | Regulated. Integrate Xero instead |
 
 ---
+
+## The lead concierge
+
+A portal enquiry that waits until nine in the morning usually belongs to another agent by then. So
+this answers in seconds — but answering fast is only safe if the thing answering cannot improvise.
+
+**The state machine lives in code, and the model cannot move it.** That is the whole design:
+
+1. The server decides which question is due, from the state it owns.
+2. The model writes one sentence asking it, and *proposes* facts it thinks it heard.
+3. The server re-validates every proposed fact with its own parsers and discards anything it
+   cannot verify in the enquirer's own words.
+4. The server advances one step, and only if the fact that step exists to collect is now present.
+
+Ask a model "what state are we in now?" and it will happily answer BOOK_VIEWING because the
+conversation felt like it was going well — then offer a viewing to someone whose budget nobody
+established. Here the model is a phrasing engine with no authority over the conversation.
+
+On top of that:
+
+- **Escalation is evaluated in code before the model runs at all.** Eviction, bereavement,
+  affordability, a request for a human, a request for advice only a qualified person should give, a
+  complaint, or an out-of-area enquiry all hand over immediately. None of it depends on a model
+  choosing to notice.
+- **Sensitive cases stop automation for good** and get a deliberately human reply.
+- **Replies are audited before sending.** Over the word limit, a banned promise, or any money
+  figure the server did not supply, and the reply is thrown away, the scripted line goes out
+  instead, and the block is recorded on the thread where staff can see it.
+- **Viewings are booked against the real diary**, reusing the clash detection. A confirmation that
+  is not in the diary is a lie the agent discovers on the doorstep.
+- **Every turn is auditable**: state before, state after, and the reason the server moved or held.
+
+With no API key it runs scripted: machine, validation, guardrails and booking all live, only the
+wording templated.
 
 ## The listing studio
 
@@ -201,7 +238,16 @@ GET    /api/maintenance             tickets with response-target breach flags
 POST   /api/maintenance
 PATCH  /api/maintenance/:id
 GET    /api/listings/options        available tones + which provider is live
-POST   /api/listings/generate       property + tone → portal, social, email copy
+POST   /api/listings/generate       property + tone → copy + material information check
+GET    /api/concierge               enquiries with live/booked/escalated counts
+GET    /api/concierge/:id           thread, state, validated facts, offered slots
+POST   /api/concierge               start an enquiry (a portal webhook in production)
+POST   /api/concierge/:id/messages  one message in, one audited reply out
+POST   /api/concierge/:id/handover  a person takes over; automation stops
+GET    /api/sales                   chains assessed, offers, pipeline
+POST   /api/sales/offers
+PATCH  /api/sales/offers/:id        accepting moves the property to under offer
+PATCH  /api/sales/links/:id         move one milestone on one chain link
 ```
 
 ---

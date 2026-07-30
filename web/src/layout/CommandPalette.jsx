@@ -13,6 +13,8 @@ const PAGES = [
   { id: 'nav-compliance', label: 'Compliance', to: '/compliance', group: 'Go to' },
   { id: 'nav-maintenance', label: 'Maintenance', to: '/maintenance', group: 'Go to' },
   { id: 'nav-documents', label: 'Document search', to: '/documents', group: 'Go to' },
+  { id: 'nav-sales', label: 'Sales progression', to: '/sales', group: 'Go to' },
+  { id: 'nav-concierge', label: 'Lead concierge', to: '/concierge', group: 'Go to' },
   { id: 'nav-studio', label: 'Listing studio', to: '/studio', group: 'Go to' },
 ];
 

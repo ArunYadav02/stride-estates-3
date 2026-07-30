@@ -91,6 +91,20 @@ export const api = {
   documents: () => request('/documents'),
   askDocument: (id, question) => request(`/documents/${id}/ask`, { method: 'POST', body: { question } }),
 
+  conciergeMeta: () => request('/concierge/meta'),
+  conversations: () => request('/concierge'),
+  conversation: (id) => request(`/concierge/${id}`),
+  startConversation: (body) => request('/concierge', { method: 'POST', body }),
+  sendConciergeMessage: (id, body) =>
+    request(`/concierge/${id}/messages`, { method: 'POST', body: { body } }),
+  conciergeHandover: (id, note) =>
+    request(`/concierge/${id}/handover`, { method: 'POST', body: { note } }),
+
+  sales: () => request('/sales'),
+  createOffer: (body) => request('/sales/offers', { method: 'POST', body }),
+  updateOffer: (id, status) => request(`/sales/offers/${id}`, { method: 'PATCH', body: { status } }),
+  updateChainLink: (id, body) => request(`/sales/links/${id}`, { method: 'PATCH', body }),
+
   listingOptions: () => request('/listings/options'),
   listings: () => request('/listings'),
   generateListing: (body) => request('/listings/generate', { method: 'POST', body }),

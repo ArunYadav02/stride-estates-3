@@ -8,6 +8,7 @@ import CommandPalette from './CommandPalette';
 import {
   IconHome, IconBuilding, IconUsers, IconCalendar, IconShield,
   IconWrench, IconFile, IconSparkle, IconSun, IconMoon, IconSearch,
+  IconChain, IconChat,
 } from './icons';
 import styles from './AppShell.module.css';
 
@@ -17,12 +18,14 @@ const NAV = [
   { to: '/properties', label: 'Properties', icon: IconBuilding },
   { to: '/applicants', label: 'Applicants', icon: IconUsers },
   { to: '/diary', label: 'Diary', icon: IconCalendar },
+  { to: '/sales', label: 'Sales progression', icon: IconChain },
   { section: 'Property care' },
   { to: '/compliance', label: 'Compliance', icon: IconShield, alertKey: 'compliance' },
   { to: '/maintenance', label: 'Maintenance', icon: IconWrench },
   { section: 'Intelligence' },
   { to: '/documents', label: 'Document search', icon: IconFile },
   { to: '/studio', label: 'Listing studio', icon: IconSparkle },
+  { to: '/concierge', label: 'Lead concierge', icon: IconChat },
 ];
 
 export default function AppShell({ alerts = {} }) {

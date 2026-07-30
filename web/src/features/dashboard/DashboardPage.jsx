@@ -9,6 +9,8 @@ import { useAsync } from '../../lib/hooks';
 
 export default function DashboardPage() {
   const { loading, error, data } = useAsync(() => api.dashboard(), []);
+  const concierge = useAsync(() => api.conversations(), []);
+  const sales = useAsync(() => api.sales(), []);
 
   if (loading) {
     return (
@@ -54,6 +56,28 @@ export default function DashboardPage() {
         <Stat label="Applicants" value={counts.applicants} note="registered and active" />
         <Stat label="Viewings" value={counts.viewings_week} note="booked this week" />
       </div>
+
+      {concierge.data?.summary && (concierge.data.summary.escalated > 0 || concierge.data.summary.booked > 0) && (
+        <Banner
+          tone={concierge.data.summary.sensitive ? 'danger' : 'accent'}
+          title="While the office was shut:"
+          actions={<Button as={Link} to="/concierge" size="sm">Open concierge</Button>}
+        >
+          {concierge.data.summary.booked} viewing{concierge.data.summary.booked === 1 ? '' : 's'} booked,{' '}
+          {concierge.data.summary.escalated} passed to a person
+          {concierge.data.summary.sensitive > 0 && `, ${concierge.data.summary.sensitive} needing care`}.
+        </Banner>
+      )}
+
+      {sales.data?.summary?.chains_at_risk > 0 && (
+        <Banner
+          tone="warning"
+          title={`${sales.data.summary.chains_at_risk} chain${sales.data.summary.chains_at_risk > 1 ? 's' : ''} at risk.`}
+          actions={<Button as={Link} to="/sales" size="sm">Open progression</Button>}
+        >
+          {sales.data.chains.find((chain) => chain.at_risk)?.what_to_chase}
+        </Banner>
+      )}
 
       <div className="cols cols-main">
         <Card

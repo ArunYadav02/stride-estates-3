@@ -22,10 +22,44 @@ const database = new DatabaseSync(file);
 database.exec('PRAGMA foreign_keys = ON');
 database.exec('PRAGMA journal_mode = WAL');
 
-/** Run the schema. Safe to call repeatedly — every statement is IF NOT EXISTS. */
+// Columns added to existing tables after the first release. CREATE TABLE IF NOT
+// EXISTS will not add them to a database that already exists, so they are
+// applied separately and idempotently. Small, boring, and the reason nobody has
+// to delete their data to take an update.
+const ADDED_COLUMNS = [
+  ['properties', 'tenure', 'TEXT'],
+  ['properties', 'council_tax_band', 'TEXT'],
+  ['properties', 'material_info', "TEXT NOT NULL DEFAULT '{}'"],
+];
+
+// Tables whose shape changed before they ever carried real data. CREATE TABLE
+// IF NOT EXISTS will not reshape an existing table, so if the marker column is
+// missing the table is dropped and rebuilt from the schema. Children first.
+const REBUILD_IF_MISSING = [
+  ['chain_links', 'agreed_on'],
+  ['chains', 'name'],
+];
+
+/** Run the schema, then apply any later column additions. */
 export function migrate() {
+  REBUILD_IF_MISSING.forEach(([table, marker]) => {
+    const existing = database.prepare(`PRAGMA table_info(${table})`).all();
+    if (existing.length && !existing.some((row) => row.name === marker)) {
+      database.exec(`DROP TABLE ${table}`);
+      console.log(`[db] rebuilt ${table} (schema changed before release)`);
+    }
+  });
+
   const sql = readFileSync(resolve(here, 'schema.sql'), 'utf8');
   database.exec(sql);
+
+  ADDED_COLUMNS.forEach(([table, column, definition]) => {
+    const existing = database.prepare(`PRAGMA table_info(${table})`).all();
+    if (!existing.length) return;                       // table not created yet
+    if (existing.some((row) => row.name === column)) return;  // already there
+    database.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+    console.log(`[db] added ${table}.${column}`);
+  });
 }
 
 /** Rows as plain objects. */

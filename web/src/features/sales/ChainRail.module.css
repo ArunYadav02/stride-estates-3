@@ -1,0 +1,62 @@
+/* ---------------------------------------------------------------------------
+   THE CHAIN RAIL
+   A sale is only as fast as its slowest link, so the whole chain is drawn at
+   once with ours marked and the blockage highlighted. The point of the layout
+   is that you can see where the problem is without reading anything.
+   --------------------------------------------------------------------------- */
+
+.rail {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  overflow-x: auto;
+  padding: var(--space-5) var(--space-4);
+}
+
+.link {
+  flex: 0 0 216px;
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+}
+
+.ours { border-color: var(--accent); background: var(--accent-subtle); }
+
+.weakest {
+  border-color: var(--warning);
+  box-shadow: 0 0 0 3px var(--warning-subtle);
+}
+
+.joint {
+  flex: 0 0 28px;
+  display: grid;
+  place-items: center;
+  color: var(--border-strong);
+}
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.address { font-size: var(--text-md); font-weight: var(--weight-semi); line-height: 1.3; }
+.party { font-size: var(--text-sm); color: var(--text-tertiary); }
+
+.bars { display: flex; gap: 3px; }
+.bar { flex: 1; height: 5px; border-radius: 2px; background: var(--surface-sunken); }
+.done { background: var(--accent); }
+.active { background: var(--info); }
+.blocked { background: var(--warning); }
+
+.stage { font-size: var(--text-sm); font-weight: var(--weight-medium); }
+.stageBlocked { color: var(--warning); }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+}
+.legendItem { display: inline-flex; align-items: center; gap: 6px; font-size: var(--text-sm); color: var(--text-tertiary); }
+.swatch { width: 9px; height: 9px; border-radius: 2px; display: block; }

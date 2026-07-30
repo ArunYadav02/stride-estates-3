@@ -4,6 +4,7 @@ import { wrap, validate, notFound } from '../lib/http.js';
 import { uuid, now, parseJson } from '../lib/helpers.js';
 import { extractFeatures, writeCopy, auditCopy, TONE_OPTIONS } from '../services/ai/listing.js';
 import { provider } from '../services/ai/provider.js';
+import { checkMaterialInformation } from '../services/materialInfo.js';
 
 const router = Router();
 
@@ -91,6 +92,9 @@ router.post(
         passed: breaches.length === 0,
         breaches,
       },
+      // Checked against the record, not the copy: a beautifully written listing
+      // with no council tax band is still one a portal will reject.
+      material_information: checkMaterialInformation(row),
     });
   })
 );

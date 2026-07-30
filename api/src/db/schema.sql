@@ -67,6 +67,9 @@ CREATE TABLE IF NOT EXISTS properties (
   features       TEXT NOT NULL DEFAULT '[]',     -- JSON array of strings
   description    TEXT,
   available_from TEXT,
+  tenure         TEXT,                           -- freehold | leasehold | share_of_freehold
+  council_tax_band TEXT,
+  material_info  TEXT NOT NULL DEFAULT '{}',     -- JSON, see services/materialInfo.js
   landlord_id    TEXT REFERENCES contacts(id),
   created_at     TEXT NOT NULL,
   updated_at     TEXT NOT NULL
@@ -227,3 +230,95 @@ CREATE TABLE IF NOT EXISTS listings (
   email_copy    TEXT,
   created_at    TEXT NOT NULL
 );
+
+-- ===========================================================================
+-- v0.3 — lead concierge, sales chains, material information
+-- ===========================================================================
+
+-- An out-of-hours enquiry conversation. `state` is owned by the server and is
+-- the single source of truth: the model never writes to it directly.
+CREATE TABLE IF NOT EXISTS conversations (
+  id                TEXT PRIMARY KEY,
+  agency_id         TEXT NOT NULL REFERENCES agencies(id),
+  property_id       TEXT REFERENCES properties(id),
+  contact_id        TEXT REFERENCES contacts(id),
+  channel           TEXT NOT NULL DEFAULT 'sms',    -- sms | email | portal
+  handle            TEXT NOT NULL,                  -- phone number or email
+  display_name      TEXT,
+  source            TEXT,                           -- Rightmove | Zoopla | website
+  state             TEXT NOT NULL DEFAULT 'GREETING',
+  facts             TEXT NOT NULL DEFAULT '{}',     -- JSON, validated server-side
+  attempts          INTEGER NOT NULL DEFAULT 0,     -- tries in the current state
+  escalated         INTEGER NOT NULL DEFAULT 0,
+  escalation_reason TEXT,
+  sensitive         INTEGER NOT NULL DEFAULT 0,     -- stop automation entirely
+  provider          TEXT NOT NULL DEFAULT 'scripted',
+  created_at        TEXT NOT NULL,
+  updated_at        TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_conversations_agency
+  ON conversations(agency_id, escalated, updated_at);
+
+-- Every turn, with the state before and after and the reason the server moved
+-- or held. This is the audit trail that makes an automated conversation
+-- defensible when a customer complains about what it said.
+CREATE TABLE IF NOT EXISTS conversation_messages (
+  id              TEXT PRIMARY KEY,
+  agency_id       TEXT NOT NULL REFERENCES agencies(id),
+  conversation_id TEXT NOT NULL REFERENCES conversations(id),
+  role            TEXT NOT NULL,                    -- enquirer | assistant | staff | system
+  body            TEXT NOT NULL,
+  state_before    TEXT,
+  state_after     TEXT,
+  reason          TEXT,
+  guardrail       TEXT,                             -- JSON: what was blocked, if anything
+  provider        TEXT,
+  created_at      TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_messages_conversation
+  ON conversation_messages(conversation_id, created_at);
+
+-- Sales progression. An offer is a fact; a chain is the thing that actually
+-- decides whether the fact becomes money.
+CREATE TABLE IF NOT EXISTS offers (
+  id            TEXT PRIMARY KEY,
+  agency_id     TEXT NOT NULL REFERENCES agencies(id),
+  property_id   TEXT NOT NULL REFERENCES properties(id),
+  contact_id    TEXT REFERENCES contacts(id),
+  amount_pence  INTEGER NOT NULL,
+  status        TEXT NOT NULL DEFAULT 'pending',    -- pending | accepted | declined | withdrawn
+  position      TEXT,                               -- cash | mortgage_agreed | chain | tenant
+  note          TEXT,
+  created_at    TEXT NOT NULL,
+  updated_at    TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS chains (
+  id            TEXT PRIMARY KEY,
+  agency_id     TEXT NOT NULL REFERENCES agencies(id),
+  name          TEXT NOT NULL,
+  property_id   TEXT REFERENCES properties(id),     -- our instruction in this chain
+  target_date   TEXT,
+  created_at    TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS chain_links (
+  id            TEXT PRIMARY KEY,
+  agency_id     TEXT NOT NULL REFERENCES agencies(id),
+  chain_id      TEXT NOT NULL REFERENCES chains(id),
+  position      INTEGER NOT NULL,                   -- 0 = bottom of the chain
+  address       TEXT NOT NULL,
+  party         TEXT NOT NULL,
+  role          TEXT,
+  is_ours       INTEGER NOT NULL DEFAULT 0,
+  property_id   TEXT REFERENCES properties(id),
+  milestones    TEXT NOT NULL DEFAULT '{}',         -- JSON: milestone -> done|active|blocked|todo
+  stage_note    TEXT,
+  agreed_on     TEXT,
+  created_at    TEXT NOT NULL,
+  updated_at    TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_links_chain ON chain_links(chain_id, position);
